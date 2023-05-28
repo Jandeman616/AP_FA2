@@ -18,7 +18,7 @@ void Warehouse::addShelf(Shelf shelf)
 bool Warehouse::rearrangeShelf(Shelf& shelf)
 {
     bool canRearrange = false;
-    
+
     for (Employee employee : this->employees)
     {
         if (!employee.getBusy() && employee.getForkliftCertificate())
@@ -53,5 +53,40 @@ bool Warehouse::rearrangeShelf(Shelf& shelf)
 
 bool Warehouse::pickItems(std::string itemName, int itemCount)
 {
-    return true;
+    int items = 0;
+    for (Shelf shelf : this->shelves) 
+    {
+        for (Pallet pallet : shelf.pallets) 
+        {
+            if (pallet.getItemName() == itemName) 
+            {
+                items += pallet.getItemCount();
+            }
+        }
+    }
+
+    int reqItems = itemCount;
+    if (items >= reqItems) 
+    {
+        for (Shelf& shelf : this->shelves) 
+        {
+            for (Pallet& pallet : shelf.pallets) 
+            {
+                if (pallet.getItemName() == itemName) 
+                {
+                    while (pallet.takeOne())
+                    {
+                        reqItems--;
+
+                        if (reqItems == 0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
 }

@@ -235,3 +235,150 @@ TEST_CASE("Rearrange shelf with quallified, but busy, employee", "Warehouse::rea
     REQUIRE(warehouse.shelves[0].pallets[2].getItemCount() == 30);
     REQUIRE(warehouse.shelves[0].pallets[3].getItemCount() == 10);
 }
+
+TEST_CASE("Pickitems, with enough items from 1 shelf and different items", "Warehouse::pickItems")
+{
+    // Construct warehouse
+    Warehouse warehouse = Warehouse();
+    Shelf shelf1 = Shelf();
+    shelf1.pallets = {
+        Pallet("Spoons", 100, 20), 
+        Pallet("Forks", 100, 40), 
+        Pallet("Knifes", 100, 30), 
+        Pallet("Plates", 100, 10)
+    };
+    
+    warehouse.addShelf(shelf1);
+
+    // Take 10 from each pallet
+    REQUIRE(warehouse.pickItems("Spoons", 10));
+    REQUIRE(warehouse.pickItems("Forks", 10));
+    REQUIRE(warehouse.pickItems("Knifes", 10));
+    REQUIRE(warehouse.pickItems("Plates", 10));
+
+    // Check updated stocks (should be reduced by 10)
+    REQUIRE(warehouse.shelves[0].pallets[0].getItemCount() == 10);
+    REQUIRE(warehouse.shelves[0].pallets[1].getItemCount() == 30);
+    REQUIRE(warehouse.shelves[0].pallets[2].getItemCount() == 20);
+    REQUIRE(warehouse.shelves[0].pallets[3].getItemCount() == 0);
+}
+
+TEST_CASE("Pickitems, with enough items from 1 shelf and same items", "Warehouse::pickItems")
+{
+    // Construct warehouse
+    Warehouse warehouse = Warehouse();
+    Shelf shelf1 = Shelf();
+    shelf1.pallets = {
+        Pallet("Spoons", 100, 20), 
+        Pallet("Spoons", 100, 40), 
+        Pallet("Plates", 100, 5), 
+        Pallet("Plates", 100, 10)
+    };
+    
+    warehouse.addShelf(shelf1);
+
+    // Take 30 and 10 from spoons and plates
+    REQUIRE(warehouse.pickItems("Spoons", 30));
+    REQUIRE(warehouse.pickItems("Plates", 10));
+
+    // Check updated stocks
+    REQUIRE(warehouse.shelves[0].pallets[0].getItemCount() == 0);
+    REQUIRE(warehouse.shelves[0].pallets[1].getItemCount() == 30);
+    REQUIRE(warehouse.shelves[0].pallets[2].getItemCount() == 0);
+    REQUIRE(warehouse.shelves[0].pallets[3].getItemCount() == 5);
+}
+
+TEST_CASE("Pickitems, with enough items from 2 shelves and different items", "Warehouse::pickItems")
+{
+    // Construct warehouse
+    Warehouse warehouse = Warehouse();
+    Shelf shelf1 = Shelf();
+    Shelf shelf2 = Shelf();
+    shelf1.pallets = {
+        Pallet("Spoons", 100, 20), 
+        Pallet("Forks", 100, 40), 
+        Pallet(), 
+        Pallet()
+    };
+    shelf2.pallets = {
+        Pallet(), 
+        Pallet(), 
+        Pallet("Knifes", 100, 30), 
+        Pallet("Plates", 100, 10)
+    };
+    
+    warehouse.addShelf(shelf1);
+    warehouse.addShelf(shelf2);
+
+    // Take 10 from each pallet
+    REQUIRE(warehouse.pickItems("Spoons", 10));
+    REQUIRE(warehouse.pickItems("Forks", 10));
+    REQUIRE(warehouse.pickItems("Knifes", 10));
+    REQUIRE(warehouse.pickItems("Plates", 10));
+
+    // Check updated stocks (should be reduced by 10)
+    REQUIRE(warehouse.shelves[0].pallets[0].getItemCount() == 10);
+    REQUIRE(warehouse.shelves[0].pallets[1].getItemCount() == 30);
+    REQUIRE(warehouse.shelves[1].pallets[2].getItemCount() == 20);
+    REQUIRE(warehouse.shelves[1].pallets[3].getItemCount() == 0);
+}
+
+TEST_CASE("Pickitems, with enough items from 2 shelves and same items", "Warehouse::pickItems")
+{
+    // Construct warehouse
+    Warehouse warehouse = Warehouse();
+    Shelf shelf1 = Shelf();
+    Shelf shelf2 = Shelf();
+    shelf1.pallets = {
+        Pallet("Spoons", 100, 10), 
+        Pallet("Forks", 100, 10), 
+        Pallet("Knifes", 100, 10), 
+        Pallet("Plates", 100, 10)
+    };
+    shelf2.pallets = {
+        Pallet("Spoons", 100, 20), 
+        Pallet("Forks", 100, 40), 
+        Pallet("Knifes", 100, 30), 
+        Pallet("Plates", 100, 10)
+    };
+    
+    warehouse.addShelf(shelf1);
+    warehouse.addShelf(shelf2);
+
+    // Take 20 from each item
+    REQUIRE(warehouse.pickItems("Spoons", 20));
+    REQUIRE(warehouse.pickItems("Forks", 20));
+    REQUIRE(warehouse.pickItems("Knifes", 20));
+    REQUIRE(warehouse.pickItems("Plates", 20));
+
+    // Check updated stocks
+    REQUIRE(warehouse.shelves[0].pallets[0].getItemCount() == 0);
+    REQUIRE(warehouse.shelves[0].pallets[1].getItemCount() == 0);
+    REQUIRE(warehouse.shelves[0].pallets[2].getItemCount() == 0);
+    REQUIRE(warehouse.shelves[0].pallets[3].getItemCount() == 0);
+    
+    REQUIRE(warehouse.shelves[1].pallets[0].getItemCount() == 10);
+    REQUIRE(warehouse.shelves[1].pallets[1].getItemCount() == 30);
+    REQUIRE(warehouse.shelves[1].pallets[2].getItemCount() == 20);
+    REQUIRE(warehouse.shelves[1].pallets[3].getItemCount() == 0);
+}
+
+TEST_CASE("Pickitems, without enough items", "Warehouse::pickItems")
+{
+    // Construct warehouse
+    Warehouse warehouse = Warehouse();
+    Shelf shelf1 = Shelf();
+    Shelf shelf2 = Shelf();
+    shelf1.pallets = {
+        Pallet(), 
+        Pallet(), 
+        Pallet(), 
+        Pallet()
+    };
+
+    // Take from each item
+    REQUIRE(!warehouse.pickItems("Spoons", 20));
+    REQUIRE(!warehouse.pickItems("Forks", 20));
+    REQUIRE(!warehouse.pickItems("Knifes", 20));
+    REQUIRE(!warehouse.pickItems("Plates", 20));
+}
