@@ -19,6 +19,7 @@ bool Warehouse::rearrangeShelf(Shelf& shelf)
 {
     bool canRearrange = false;
 
+    // Controleer of er een medewerker is die tijd heeft en een forklift kan besturen
     for (Employee employee : this->employees)
     {
         if (!employee.getBusy() && employee.getForkliftCertificate())
@@ -27,6 +28,7 @@ bool Warehouse::rearrangeShelf(Shelf& shelf)
         }
     }
 
+    // Als dit kan doe dan een bubblesort op de 4 pallets
     while (canRearrange)
     {
         bool swapped = false;
@@ -53,6 +55,7 @@ bool Warehouse::rearrangeShelf(Shelf& shelf)
 
 bool Warehouse::pickItems(std::string itemName, int itemCount)
 {
+    // Controleer hoeveel items er zijn met de gegeven naam
     int items = 0;
     for (Shelf shelf : this->shelves) 
     {
@@ -65,6 +68,8 @@ bool Warehouse::pickItems(std::string itemName, int itemCount)
         }
     }
 
+    // Kijk of er genoeg items zijn om de aan de gevraagde hoeveelheid te voldoen
+    // En pak elke keer een item totdat de gevraagde hoeveelheid is gepakt
     int reqItems = itemCount;
     if (items >= reqItems) 
     {
@@ -89,4 +94,24 @@ bool Warehouse::pickItems(std::string itemName, int itemCount)
     }
 
     return false;
+}
+
+std::string Warehouse::toString()
+{
+    std::stringstream string;
+
+    string << "Warehouse:" << std::endl << "[" << std::endl;
+    for (Shelf& shelf : this->shelves) 
+    {
+        string << "  Shelf:" << std::endl << "  (" << std::endl;
+        for (Pallet& pallet : shelf.pallets) 
+        {
+            string << "    Pallet: " << pallet.getItemName();
+            string << ", stock: " << pallet.getItemCount() << "/" << (pallet.getItemCount() + pallet.getRemainingSpace()) << std::endl;
+        }
+        string << "  )" << std::endl;
+    }
+    string << "]" << std::endl;
+
+    return string.str();
 }
