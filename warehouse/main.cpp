@@ -24,7 +24,7 @@ int main(void)
     warehouse.addShelf(shelf1);
     warehouse.addShelf(shelf2);
 
-    std::cout << warehouse.toString() << std::endl;
+    std::cout << warehouse << std::endl;
 
     warehouse.pickItems("Books", 57); // werkt
     warehouse.pickItems("Boxes", 23); // werkt
@@ -32,5 +32,5 @@ int main(void)
 
     std::cout << "Na het weghalen van bepaalde producten:" << std::endl << std::endl;
 
-    std::cout << warehouse.toString() << std::endl;
+    std::cout << warehouse << std::endl;
 }

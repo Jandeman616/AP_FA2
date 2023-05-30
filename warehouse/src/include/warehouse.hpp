@@ -18,5 +18,5 @@ class Warehouse
         void addShelf(Shelf shelf);
         bool rearrangeShelf(Shelf& shelf);
         bool pickItems(std::string itemName, int itemCount);
-        std::string toString();
+        friend std::ostream& operator<<(std::ostream& stream, Warehouse& warehouse);
 };

@@ -96,22 +96,19 @@ bool Warehouse::pickItems(std::string itemName, int itemCount)
     return false;
 }
 
-std::string Warehouse::toString()
+std::ostream& operator<<(std::ostream& stream, Warehouse& warehouse)
 {
-    std::stringstream string;
-
-    string << "Warehouse:" << std::endl << "[" << std::endl;
-    for (Shelf& shelf : this->shelves) 
+    stream << "Warehouse:" << std::endl << "[" << std::endl;
+    for (Shelf& shelf : warehouse.shelves) 
     {
-        string << "  Shelf:" << std::endl << "  (" << std::endl;
+        stream << "  Shelf:" << std::endl << "  (" << std::endl;
         for (Pallet& pallet : shelf.pallets) 
         {
-            string << "    Pallet: " << pallet.getItemName();
-            string << ", stock: " << pallet.getItemCount() << "/" << (pallet.getItemCount() + pallet.getRemainingSpace()) << std::endl;
+            stream << "    Pallet: " << pallet.getItemName();
+            stream << ", stock: " << pallet.getItemCount() << "/" << (pallet.getItemCount() + pallet.getRemainingSpace()) << std::endl;
         }
-        string << "  )" << std::endl;
+        stream << "  )" << std::endl;
     }
-    string << "]" << std::endl;
-
-    return string.str();
+    stream << "]" << std::endl;
+    return stream;
 }
